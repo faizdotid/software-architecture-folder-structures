@@ -1,172 +1,373 @@
-# Folder Structures for Different Software Architectures
+# Software Architecture Folder Structures
 
-Below are examples of folder structures for various software architectures.
+A curated collection of folder structures for various software architectures.
+Each structure includes a brief explanation to help you decide when to use it.
 
-## 1. Layered Architecture (N-Tier Architecture)
+---
+
+## Table of Contents
+
+1. [Layered (N-Tier) Architecture](#1-layered-architecture-n-tier)
+2. [Monolithic Architecture](#2-monolithic-architecture)
+3. [Modular Monolith](#3-modular-monolith)
+4. [Microservices Architecture](#4-microservices-architecture)
+5. [Hexagonal Architecture (Ports & Adapters)](#5-hexagonal-architecture-ports-and-adapters)
+6. [Clean Architecture](#6-clean-architecture)
+7. [Domain-Driven Design (DDD)](#7-domain-driven-design-ddd)
+8. [Vertical Slice Architecture](#8-vertical-slice-architecture)
+9. [CQRS (Command Query Responsibility Segregation)](#9-cqrs)
+10. [Event-Driven Architecture](#10-event-driven-architecture)
+11. [Component-Based Architecture](#11-component-based-architecture)
+12. [Serverless Architecture](#12-serverless-architecture)
+13. [Plugin-Based Architecture](#13-plugin-based-architecture)
+
+---
+
+## 1. Layered Architecture (N-Tier)
+
+**When to use:** Small to medium-sized applications where separation of concerns is enough. Great for CRUD apps and prototypes.
 
 ```
 project/
 │
-├── cmd/                     # Main entry point (optional for larger projects)
+├── cmd/                     # Main entry point (optional)
 │   └── main.go
-├── presentation/            # Presentation layer (API, UI)
-│   ├── controllers/         # Handlers for requests
-│   └── views/               # HTML, Templates (for UI)
-├── business/                # Business logic layer
-│   ├── services/            # Core business logic
-│   └── models/              # Domain models/entities
-├── data/                    # Data access layer
-│   ├── repositories/        # Interactions with the database
-│   └── migrations/          # Database migrations
-├── config/                  # Configuration files
+├── presentation/            # API / UI layer
+│   ├── controllers/
+│   └── views/
+├── business/                # Business logic
+│   ├── services/
+│   └── models/
+├── data/                    # Data access
+│   ├── repositories/
+│   └── migrations/
+├── config/
 │   └── config.yaml
-└── pkg/                     # Shared utilities or packages
+└── pkg/                     # Shared utilities
 ```
 
-## 2. Microservices Architecture
+---
+
+## 2. Monolithic Architecture
+
+**When to use:** Single deployable unit. Good for startups and small teams before splitting into microservices.
 
 ```
 project/
 │
-├── service-user/            # User service
-│   ├── cmd/                 # Main entry point
-│   ├── api/                 # API endpoints
-│   ├── domain/              # Business logic for user
-│   ├── repository/          # Data access for user service
-│   └── config/              # Configuration for user service
+├── cmd/
+│   └── main.go
+├── api/
+│   ├── controllers/
+│   └── middlewares/
+├── services/                # Business logic
+├── models/                  # Domain entities
+├── repository/              # Data access
+└── config/
+```
+
+---
+
+## 3. Modular Monolith
+
+**When to use:** You want the simplicity of a monolith with clear module boundaries. Easier to later extract into microservices.
+
+```
+project/
 │
-├── service-order/           # Order service
-│   ├── cmd/                 # Main entry point
-│   ├── api/                 # API endpoints
-│   ├── domain/              # Business logic for order
-│   ├── repository/          # Data access for order service
-│   └── config/              # Configuration for order service
+├── cmd/
+│   └── main.go
+├── modules/                 # Bounded modules
+│   ├── user/
+│   │   ├── handler.go
+│   │   ├── service.go
+│   │   ├── repository.go
+│   │   └── model.go
+│   ├── order/
+│   │   ├── handler.go
+│   │   ├── service.go
+│   │   ├── repository.go
+│   │   └── model.go
+│   └── product/
+│       ├── handler.go
+│       ├── service.go
+│       ├── repository.go
+│       └── model.go
+├── shared/                  # Common code
+│   ├── database/
+│   ├── middleware/
+│   └── logger/
+└── config/
+```
+
+---
+
+## 4. Microservices Architecture
+
+**When to use:** Large scale, independent deployability, polyglot persistence, and autonomous teams.
+
+```
+project/
 │
-└── common/                  # Shared components (auth, logging, etc.)
+├── service-user/
+│   ├── cmd/
+│   ├── api/
+│   ├── domain/
+│   ├── repository/
+│   └── config/
+│
+├── service-order/
+│   ├── cmd/
+│   ├── api/
+│   ├── domain/
+│   ├── repository/
+│   └── config/
+│
+└── shared/
     ├── auth/
     ├── logging/
     └── monitoring/
 ```
 
-## 3. Hexagonal Architecture (Ports and Adapters)
+---
+
+## 5. Hexagonal Architecture (Ports and Adapters)
+
+**When to use:** You need to swap external dependencies (DB, messaging, APIs) without touching core logic.
 
 ```
 project/
 │
 ├── cmd/
-│   └── main.go              # Main application entry point
+│   └── main.go
 ├── adapters/                # External dependencies
-│   ├── api/                 # REST API or GraphQL interfaces
-│   ├── database/            # Database connections
-│   └── messaging/           # Message queues or event systems
-├── core/                    # Core domain logic (business rules)
-│   ├── domain/              # Entities, aggregates, value objects
-│   ├── services/            # Application services
-│   └── ports/               # Interfaces for external systems
-└── infrastructure/          # Frameworks and drivers
-    └── config/              # Configuration and setup
+│   ├── api/                 # REST / GraphQL
+│   ├── database/
+│   └── messaging/
+├── core/                    # Business rules
+│   ├── domain/
+│   ├── services/
+│   └── ports/               # Interfaces
+└── infrastructure/
+    └── config/
 ```
 
-## 4. Clean Architecture
+---
 
-```
-project/
-│
-├── cmd/                     # Main application entry point
-│   └── main.go
-├── entities/                # Core domain entities
-│   └── user.go
-├── usecases/                # Use case (application) layer
-│   └── user_usecase.go      # Application logic for user-related operations
-├── interfaces/              # Interface adapters (controllers, presenters, etc.)
-│   ├── api/                 # API controllers
-│   └── repository/          # Data access implementations (DB, API)
-├── infrastructure/          # Frameworks and drivers (database, logging, etc.)
-│   ├── database/            # DB interactions
-│   └── logging/             # Logging setup
-└── config/                  # Configuration files
-```
+## 6. Clean Architecture
 
-## 5. Monolithic Architecture
+**When to use:** Long-lived projects where testability and dependency direction matter. Core business logic has zero external dependencies.
 
 ```
 project/
 │
 ├── cmd/
-│   └── main.go              # Main entry point
-├── api/                     # API endpoints
-│   ├── controllers/         # Request handlers
-│   └── middlewares/         # Middleware for request lifecycle
-├── services/                # Business logic and services
-├── models/                  # Data models or domain entities
-├── repository/              # Data access layer
-└── config/                  # Configuration files
-```
-
-## 6. Event-Driven Architecture
-
-```
-project/
-│
-├── cmd/                     # Entry points for event processors
 │   └── main.go
-├── events/                  # Event definitions
+├── entities/                # Enterprise-wide business rules
+├── usecases/                # Application-specific logic
+├── interfaces/              # Adapters (controllers, presenters)
+│   ├── api/
+│   └── repository/
+├── infrastructure/          # DB, web frameworks, logging
+│   ├── database/
+│   └── logging/
+└── config/
+```
+
+---
+
+## 7. Domain-Driven Design (DDD)
+
+**When to use:** Complex business domains where modeling real-world concepts (aggregates, entities, value objects) reduces complexity.
+
+```
+project/
+│
+├── cmd/
+│   └── main.go
+├── domain/                  # Core domain
+│   ├── user/
+│   │   ├── entity.go
+│   │   ├── value_object.go
+│   │   ├── aggregate.go
+│   │   └── repository.go    # Interface only
+│   └── order/
+│       ├── entity.go
+│       ├── value_object.go
+│       ├── aggregate.go
+│       └── repository.go
+├── application/             # Use cases / services
+│   ├── user_service.go
+│   └── order_service.go
+├── infrastructure/          # Implementation details
+│   ├── persistence/
+│   │   ├── user_repository.go
+│   │   └── order_repository.go
+│   └── messaging/
+├── interfaces/              # Delivery mechanisms
+│   ├── http/
+│   └── grpc/
+└── config/
+```
+
+---
+
+## 8. Vertical Slice Architecture
+
+**When to use:** Features change independently and you want each feature to be self-contained (handler + logic + data access in one slice).
+
+```
+project/
+│
+├── cmd/
+│   └── main.go
+├── features/                # One folder per feature
+│   ├── createUser/
+│   │   ├── handler.go
+│   │   ├── command.go
+│   │   └── validator.go
+│   ├── getUser/
+│   │   ├── handler.go
+│   │   ├── query.go
+│   │   └── validator.go
+│   └── deleteUser/
+│       ├── handler.go
+│       ├── command.go
+│       └── validator.go
+├── shared/                  # Cross-cutting concerns
+│   ├── database/
+│   ├── middleware/
+│   └── logger/
+└── config/
+```
+
+---
+
+## 9. CQRS
+
+**When to use:** Read and write workloads differ significantly. Reads need optimization (projections, caching) while writes enforce business rules.
+
+```
+project/
+│
+├── cmd/
+│   ├── api/                 # Write API
+│   └── worker/              # Read projections
+├── commands/                # Write side
+│   ├── handlers/
+│   ├── validators/
+│   └── events/
+├── queries/                 # Read side
+│   ├── handlers/
+│   ├── projections/
+│   └── dto/
+├── domain/
+│   ├── aggregates/
+│   └── events/
+├── infrastructure/
+│   ├── read_db/
+│   └── write_db/
+└── config/
+```
+
+---
+
+## 10. Event-Driven Architecture
+
+**When to use:** Systems with high decoupling requirements, real-time processing, or async workflows.
+
+```
+project/
+│
+├── cmd/
+│   └── main.go
+├── events/
 │   └── user_event.go
-├── handlers/                # Event handlers
+├── handlers/
 │   └── user_event_handler.go
-├── services/                # Business logic reacting to events
-├── consumers/               # Event consumers (e.g., Kafka, RabbitMQ)
-├── producers/               # Event producers
-└── config/                  # Configuration for event sources
+├── services/
+├── consumers/               # Kafka, RabbitMQ, etc.
+├── producers/
+└── config/
 ```
 
-## 7. Component-Based Architecture
+---
 
-```
-project/
-│
-├── components/              # Modular, reusable components
-│   ├── auth/                # Authentication component
-│   ├── user/                # User management component
-│   └── order/               # Order management component
-├── shared/                  # Shared utilities or code between components
-└── config/                  # Application configuration
-```
+## 11. Component-Based Architecture
 
-## 8. Serverless Architecture
+**When to use:** Frontend projects or systems built from reusable, interchangeable components.
 
 ```
 project/
 │
-├── functions/               # Individual serverless functions
-│   ├── createUser/          # User creation function
-│   ├── processOrder/        # Order processing function
-│   └── notifyUser/          # Notification function
-├── events/                  # Event definitions for triggering functions
-├── models/                  # Data models shared between functions
-├── services/                # Business logic and reusable services
-└── config/                  # Configuration (e.g., for AWS Lambda, Azure Functions)
+├── components/
+│   ├── auth/
+│   ├── user/
+│   └── order/
+├── shared/
+└── config/
 ```
 
-## 9. Plugin-Based Architecture
+---
+
+## 12. Serverless Architecture
+
+**When to use:** Event-triggered, auto-scaling workloads. Pay-per-execution models (AWS Lambda, Azure Functions, Cloudflare Workers).
 
 ```
 project/
 │
-├── core/                    # Core application logic
+├── functions/
+│   ├── createUser/
+│   ├── processOrder/
+│   └── notifyUser/
+├── events/
+├── models/
+├── services/
+└── config/
+```
+
+---
+
+## 13. Plugin-Based Architecture
+
+**When to use:** Applications that need to be extended by third-party developers or dynamically loaded modules.
+
+```
+project/
+│
+├── core/
 │   ├── api/
 │   ├── services/
 │   └── models/
-├── plugins/                 # Plugins adding modular functionality
-│   ├── auth/                # Authentication plugin
-│   ├── payments/            # Payment plugin
-│   └── analytics/           # Analytics plugin
-├── shared/                  # Shared code between core and plugins
-└── config/                  # Configuration for core and plugins
+├── plugins/
+│   ├── auth/
+│   ├── payments/
+│   └── analytics/
+├── shared/
+└── config/
 ```
 
-Each folder structure serves a different purpose depending on the type of project and scale of the application being built. These structures can be modified according to team needs and the technologies used.
+---
 
-## Credits
+## How to Choose
 
-- [ChatGPT](https://chatgpt.com/)
+| Architecture | Team Size | Complexity | Scalability | When to Use |
+|-------------|-----------|------------|-------------|-------------|
+| Layered | Small | Low | Low | CRUD apps, prototypes |
+| Monolith | Small-Medium | Low-Medium | Medium | MVPs, small teams |
+| Modular Monolith | Medium | Medium | Medium | Pre-microservices stage |
+| Microservices | Large | High | High | Independent scaling, polyglot |
+| Hexagonal | Medium | Medium | Medium | Swappable dependencies |
+| Clean | Medium | Medium | Medium | Long-term maintainability |
+| DDD | Medium-Large | High | Medium | Complex business domains |
+| Vertical Slice | Medium | Medium | Medium | Feature-centric teams |
+| CQRS | Medium-Large | High | High | Different read/write loads |
+| Event-Driven | Medium-Large | High | High | Async, decoupled systems |
+| Component | Any | Low | Low | Reusable UI/modules |
+| Serverless | Small-Medium | Low | Auto | Event-triggered workloads |
+| Plugin | Medium | Medium | Medium | Extensible platforms |
+
+---
+
+> These structures are starting points. Adapt them to your team's needs, tech stack, and project scale.
